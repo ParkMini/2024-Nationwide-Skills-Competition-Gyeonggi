@@ -6,6 +6,7 @@
 
 body {
     width: 100%;
+    padding-top: 70px;
 }
 
 li {
@@ -28,7 +29,7 @@ header {
     position: fixed;
     top: 0;
     left: 0;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: #eee;
 }
 
 header > ul {
@@ -45,7 +46,7 @@ header > ul > li > ul {
     top: 230%;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: #eee;
 }
 
 header ul:hover li ul {
