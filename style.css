@@ -66,3 +66,28 @@ header .active {
     font-weight: bold;
     color: blue;
 }
+
+/* 비주얼 영역 */
+@keyframes visualAreaSlide {
+    0%, 20%, 100% {
+        background-image: url("./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/img/1.jpg");
+    }
+    25%, 45% {
+        background-image: url("./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/img/2.jpg");
+    }
+    50%, 70% {
+        background-image: url("./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/img/3.jpg");
+    }
+    75%, 95% {
+        background-image: url("./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/img/4.jpg");
+    }
+}
+
+#visualArea {
+    width: 80%;
+    height: 800px;
+    margin: 30px auto 0 auto;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    animation: visualAreaSlide 12s infinite;
+}
