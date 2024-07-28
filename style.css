@@ -67,6 +67,22 @@ header .active {
     color: blue;
 }
 
+/* 푸터 영역 */
+footer {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    background-color: #ccc;
+    width: 100%;
+    height: 100px;
+}
+
+footer * {
+    margin-right: 10px;
+}
+
 /* 비주얼 영역 */
 @keyframes visualAreaSlide {
     0%, 30%, 100% {
