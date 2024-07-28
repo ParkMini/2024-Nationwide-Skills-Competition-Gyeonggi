@@ -69,17 +69,14 @@ header .active {
 
 /* 비주얼 영역 */
 @keyframes visualAreaSlide {
-    0%, 20%, 100% {
+    0%, 30%, 100% {
         background-image: url("./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/img/1.jpg");
     }
-    25%, 45% {
+    33%, 63% {
         background-image: url("./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/img/2.jpg");
     }
-    50%, 70% {
+    66%, 96% {
         background-image: url("./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/img/3.jpg");
-    }
-    75%, 95% {
-        background-image: url("./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/img/4.jpg");
     }
 }
 
@@ -90,4 +87,77 @@ header .active {
     background-size: 100% 100%;
     background-repeat: no-repeat;
     animation: visualAreaSlide 12s infinite;
+}
+
+/* 공지사항 영역 */
+#noticeArea {
+    margin-top: 30px;
+    text-align: center;
+}
+
+#noticeArea h1 {
+    margin-bottom: 10px;
+}
+
+#noticeArea input {
+    display: none;
+}
+
+#noticeArea label {
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    color: gray;
+}
+
+#noticeArea input:checked + label {
+    color: black;
+}
+
+#noticeArea > div {
+    margin-top: 40px;
+}
+
+#noticeArea .content img {
+    width: 128px;
+    height: 128px;
+    margin: 0 10px;
+}
+
+#noticeArea .content ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#noticeArea .content .title {
+    margin-top: 10px;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+#noticeArea .content .date {
+    font-size: 24px;
+    color: #444;
+}
+
+#noticeArea .content {
+    border: dotted 1px black;
+    border-radius: 10px;
+    width: 50%;
+    margin: 10px auto;
+    padding: 20px;
+    display: none;
+}
+
+#noticeArea .content:hover {
+    border: solid 2px black;
+}
+
+#noticeArea #n_culture:checked ~ #n_culture_content,
+#noticeArea #n_edu:checked ~ #n_edu_content,
+#noticeArea #n_activity:checked ~ #n_activity_content {
+    display: block;
 }
