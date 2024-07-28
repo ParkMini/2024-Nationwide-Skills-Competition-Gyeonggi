@@ -116,14 +116,15 @@ header .active {
     color: black;
 }
 
-#noticeArea > div {
-    margin-top: 40px;
+#noticeArea .notice_content {
+    display: none;
 }
 
 #noticeArea .content img {
     width: 128px;
     height: 128px;
     margin: 0 10px;
+    border-radius: 30px;
 }
 
 #noticeArea .content ul {
@@ -143,21 +144,24 @@ header .active {
     color: #444;
 }
 
+#noticeArea .parentContent {
+    display: none;
+}
+
 #noticeArea .content {
     border: dotted 1px black;
     border-radius: 10px;
     width: 50%;
     margin: 10px auto;
     padding: 20px;
-    display: none;
 }
 
 #noticeArea .content:hover {
     border: solid 2px black;
 }
 
-#noticeArea #n_culture:checked ~ #n_culture_content,
-#noticeArea #n_edu:checked ~ #n_edu_content,
-#noticeArea #n_activity:checked ~ #n_activity_content {
+#n_culture:checked ~ #n_culture_content,
+#n_edu:checked ~ #n_edu_content,
+#n_activity:checked ~ #n_activity_content {
     display: block;
 }
