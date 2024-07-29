@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퀴즈 이벤트 참가</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        #map {
+            width: 1280px;
+            height: 700px;
+            border: 1px solid #ccc;
+        }
+        #controls {
+            margin-bottom: 20px;
+        }
+        #controls button, #controls select {
+            margin-right: 10px;
+        }
+        #couponModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #couponModal input {
+            margin-bottom: 10px;
+        }
+        #quizSection {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="controls">
+    <button id="couponBtn">쿠폰발급</button>
+    <button id="startQuizBtn">퀴즈시작</button>
+    <select id="courseSelect">
+        <option value="">코스 선택</option>
+        <option value="course1">코스 1</option>
+        <option value="course2">코스 2</option>
+        <option value="course3">코스 3</option>
+    </select>
+</div>
+<div id="map">지도 표시 영역</div>
+
+<div id="couponModal">
+    <h2>쿠폰 발급</h2>
+    <input type="text" id="nameInput" placeholder="이름 입력">
+    <button id="issueCouponBtn">발급</button>
+</div>
+
+<div id="quizSection">
+    <h2>퀴즈</h2>
+    <p id="question"></p>
+    <div id="answers"></div>
+</div>
+
+<script>
+    let quizStarted = false;
+    let stampCardIssued = false;
+
+    const couponBtn = document.getElementById('couponBtn');
+    const startQuizBtn = document.getElementById('startQuizBtn');
+    const courseSelect = document.getElementById('courseSelect');
+    const couponModal = document.getElementById('couponModal');
+    const nameInput = document.getElementById('nameInput');
+    const issueCouponBtn = document.getElementById('issueCouponBtn');
+    const quizSection = document.getElementById('quizSection');
+    const questionElem = document.getElementById('question');
+    const answersElem = document.getElementById('answers');
+
+    const quizzes = {
+        course1: [
+            { question: '창덕궁 문제', answers: ['정답1', '오답1', '오답2'], correct: 0 },
+            { question: '경복궁 문제', answers: ['오답1', '정답2', '오답2'], correct: 1 },
+            { question: '신라 문제', answers: ['오답1', '오답2', '정답3'], correct: 2 }
+        ],
+        course2: [
+            // 다른 코스의 퀴즈
+        ],
+        course3: [
+            // 다른 코스의 퀴즈
+        ]
+    };
+
+    couponBtn.addEventListener('click', () => {
+        if (quizStarted) {
+            alert('이미 퀴즈가 시작되어 쿠폰을 발급 받을 수 없습니다!');
+            return;
+        }
+        couponModal.style.display = 'block';
+    });
+
+    issueCouponBtn.addEventListener('click', () => {
+        const name = nameInput.value;
+        if (name.trim() === '') {
+            alert('이름을 입력하세요.');
+            return;
+        }
+        couponModal.style.display = 'none';
+        stampCardIssued = true;
+        alert('쿠폰이 발급되었습니다. 이름: ' + name);
+        // 스탬프 카드 이미지 생성 로직 필요
+    });
+
+    startQuizBtn.addEventListener('click', () => {
+        if (!stampCardIssued) {
+            alert('스탬프 카드를 업로드 해주세요.');
+            return;
+        }
+        if (quizStarted) {
+            alert('이미 퀴즈가 시작되었습니다!');
+            return;
+        }
+        quizStarted = true;
+        startQuiz();
+    });
+
+    function startQuiz() {
+        const selectedCourse = courseSelect.value;
+        if (selectedCourse === '') {
+            alert('코스를 선택하세요.');
+            return;
+        }
+        quizSection.style.display = 'block';
+        displayQuestion(selectedCourse, 0);
+    }
+
+    function displayQuestion(course, index) {
+        const quiz = quizzes[course][index];
+        questionElem.textContent = quiz.question;
+        answersElem.innerHTML = '';
+        quiz.answers.forEach((answer, i) => {
+            const button = document.createElement('button');
+            button.textContent = answer;
+            button.addEventListener('click', () => {
+                if (i === quiz.correct) {
+                    alert('정답입니다!');
+                    if (index + 1 < quizzes[course].length) {
+                        displayQuestion(course, index + 1);
+                    } else {
+                        alert('축하합니다! 해당 코스 퀴즈풀이가 완료 되었습니다!');
+                        quizStarted = false;
+                        // 스탬프 각인 로직 필요
+                    }
+                } else {
+                    alert('오답입니다! 다시 풀어보세요!');
+                }
+            });
+            answersElem.appendChild(button);
+        });
+    }
+
+    window.addEventListener('click', (event) => {
+        if (event.target === couponModal) {
+            couponModal.style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>
