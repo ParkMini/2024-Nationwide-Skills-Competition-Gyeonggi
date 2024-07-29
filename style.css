@@ -237,6 +237,7 @@ footer * {
 #information img {
     width: 100%;
     height: 80vh;
+    filter: brightness(0.5);
 }
 
 #information p {
@@ -246,5 +247,21 @@ footer * {
     left: 50%;
     text-align: center;
     color: white;
-    background-color: rgba(0, 0, 0, 0.5);
+    font-size: 24px;
+}
+
+#rule {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#rule p {
+    width: 60%;
+    text-align: center;
+    margin: 0 auto;
+    padding: 5px 0;
+}
+
+#rule p:hover {
+    color: red;
 }
