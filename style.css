@@ -30,6 +30,7 @@ header {
     top: 0;
     left: 0;
     background-color: #eee;
+    z-index: 9999;
 }
 
 header > ul {
