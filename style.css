@@ -265,3 +265,54 @@ footer * {
 #rule p:hover {
     color: red;
 }
+
+#tour_root {
+    text-align: center;
+    position: relative;
+}
+
+#tour_root h1 {
+    margin: 30px 0 10px 0;
+}
+
+#tour_root div {
+    position: absolute;
+    background: lightgray;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    top: 50px;
+    left: 320px;
+    cursor: pointer;
+}
+
+#tour_root div p {
+    display: none;
+}
+
+#tour_root div span {
+    font-size: 48px;
+}
+
+#tour_root #root_1 {
+    top: 160px;
+    left: 990px;
+}
+
+#tour_root #root_2 {
+    top: 330px;
+    left: 1040px;
+}
+
+#tour_root #root_3 {
+    top: 290px;
+    left: 910px;
+}
+
+#tour_root div:hover p {
+    display: block;
+    white-space: nowrap;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
