@@ -1,4 +1,4 @@
-<!-- B모듈 스탬프 (작동 확인) -->
+<!-- B모듈 스탬프 (주석 추가, 동작 확인 X) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,31 +26,30 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        let canUseFileSystemAPI = false;
-        let fileHandle;
-        let originalFile;
+        let fileHandle, originalFile;
 
+        // 파일 시스템 접근 API 사용 가능한지 체크
         async function checkFileSystemAccessAPI() {
             if (window.showOpenFilePicker && window.showSaveFilePicker) {
-                canUseFileSystemAPI = true;
                 $('#api-status').text('File System Access API is available.').addClass('success').removeClass('warning');
+                return true;
             } else {
                 $('#api-status').text('File System Access API is not available. The modified image will be downloaded instead.').addClass('warning').removeClass('success');
+                return false;
             }
         }
 
+        // 파일 선택창 열기
         async function openFilePicker() {
             const [handle] = await window.showOpenFilePicker({
-                types: [{
-                    description: 'PNG file',
-                    accept: { 'image/png': ['.png'] }
-                }],
+                types: [{ description: 'PNG file', accept: { 'image/png': ['.png'] } }],
                 excludeAcceptAllOption: true,
                 multiple: false
             });
             return handle;
         }
 
+        // 파일 저장
         async function saveFile(blob) {
             try {
                 const writable = await fileHandle.createWritable();
@@ -63,83 +62,74 @@
             }
         }
 
+        // 파일 다운로드
         function downloadFile(blob, filename) {
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            const a = $('<a>').attr({ href: url, download: filename }).appendTo('body');
+            a[0].click();
+            a.remove();
             URL.revokeObjectURL(url);
         }
 
-        $(document).ready(function() {
-            checkFileSystemAccessAPI();
+        // 이미지 로드
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = $('<canvas>').appendTo('#output')[0];
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    canvas.toBlob(blob => canUseFileSystemAPI && saveFile(blob), 'image/png');
+                };
+            };
+            reader.readAsDataURL(file);
+        }
 
+        // 문서가 준비되었을 때 실행
+        $(document).ready(async function() {
+            const canUseFileSystemAPI = await checkFileSystemAccessAPI();
+
+            // 업로드 버튼 클릭 시 파일 선택 또는 파일 입력
             $('#uploadButton').on('click', async function() {
-                if (canUseFileSystemAPI) {
-                    try {
+                try {
+                    if (canUseFileSystemAPI) {
                         fileHandle = await openFilePicker();
                         originalFile = await fileHandle.getFile();
-                    } catch (error) {
-                        console.error('Error opening file:', error);
-                        $('#message').text('Error opening file.').addClass('warning').removeClass('success');
-                        return;
+                    } else {
+                        originalFile = $('#fileInput')[0].files[0];
                     }
-                } else {
-                    const fileInput = $('#fileInput')[0];
-                    originalFile = fileInput.files[0];
-                }
 
-                if (originalFile && originalFile.name === 'test.png') {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        var img = new Image();
-                        img.src = e.target.result;
-
-                        img.onload = function() {
-                            var canvas = document.createElement('canvas');
-                            var ctx = canvas.getContext('2d');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-
-                            ctx.drawImage(img, 0, 0);
-                            $('#output').html(canvas);
-
-                            // Save the original file once
-                            canvas.toBlob(async function(blob) {
-                                if (canUseFileSystemAPI) {
-                                    await saveFile(blob);
-                                }
-                            }, 'image/png');
-                        };
-                    };
-                    reader.readAsDataURL(originalFile);
-                } else {
-                    $('#message').text('Incorrect image. Please upload test.png').addClass('warning').removeClass('success');
+                    if (originalFile && originalFile.name === 'test.png') {
+                        loadImage(originalFile);
+                    } else {
+                        $('#message').text('Incorrect image. Please upload test.png').addClass('warning').removeClass('success');
+                    }
+                } catch (error) {
+                    console.error('Error opening file:', error);
+                    $('#message').text('Error opening file.').addClass('warning').removeClass('success');
                 }
             });
 
+            // 수정 버튼 클릭 시 이미지 수정
             $('#modifyButton').on('click', function() {
                 if (!originalFile || originalFile.name !== 'test.png') {
                     $('#message').text('No valid image loaded. Please upload test.png').addClass('warning').removeClass('success');
                     return;
                 }
 
-                var canvas = $('#output canvas')[0];
-                var ctx = canvas.getContext('2d');
+                const canvas = $('#output canvas')[0];
+                const ctx = canvas.getContext('2d');
                 ctx.font = '30px Arial';
                 ctx.fillStyle = 'black';
                 ctx.fillText('Hello, World!', 10, 50);
 
-                canvas.toBlob(function(blob) {
-                    if (canUseFileSystemAPI) {
-                        saveFile(blob);
-                    } else {
-                        downloadFile(blob, 'test.png');
-                        $('#message').text('Changes saved successfully!').addClass('success').removeClass('warning');
-                    }
+                canvas.toBlob(blob => {
+                    canUseFileSystemAPI ? saveFile(blob) : downloadFile(blob, 'test.png');
+                    $('#message').text('Changes saved successfully!').addClass('success').removeClass('warning');
                 }, 'image/png');
             });
         });
@@ -153,7 +143,7 @@
     <input type="file" id="fileInput" accept="image/png" style="display:none;">
 </div>
 <div>
-    <button id="modifyButton">Upload and Modify</button>
+    <button id="modifyButton">Modify Image</button>
 </div>
 <div id="message"></div>
 <div id="output"></div>
