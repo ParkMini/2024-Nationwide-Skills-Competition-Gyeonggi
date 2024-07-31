@@ -1,6 +1,9 @@
 let stampFileHandle;
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
+let currentQuizData = null;
+let currentQuestionIndex = 0;
+let quizInProgress = false;
 
 // 비동기적으로 JSON 파일을 로드
 async function loadQuizData() {
@@ -14,7 +17,11 @@ async function loadQuizData() {
 }
 
 function updateCourse() {
-    startQuiz();
+    if (quizInProgress) {
+        alert("퀴즈가 진행 중입니다. 완료 후 다른 퀴즈를 선택하세요.");
+        return;
+    }
+    setMapImageByCourse();
 }
 
 function setMapImage(imageUrl) {
@@ -51,7 +58,6 @@ function updateLines() {
 async function startQuiz() {
     const selectedCourse = document.querySelector("#selectCourse").value;
     const mapsDiv = document.getElementById("maps");
-    let imageUrl;
     let quizData;
 
     // JSON 데이터를 비동기적으로 로드
@@ -59,20 +65,15 @@ async function startQuiz() {
 
     switch (selectedCourse) {
         case "창덕궁 달빛기행":
-            imageUrl = "./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/B모듈/map/창덕궁.png";
             quizData = quiz.find(item => item.name === "창덕궁 달빛기행").quiz;
             break;
         case "경복궁 달빛기행":
-            imageUrl = "./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/B모듈/map/경복궁.png";
             quizData = quiz.find(item => item.name === "경복궁 달빛기행").quiz;
             break;
         case "신라 달빛기행":
-            imageUrl = "./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/B모듈/map/신라.png";
             quizData = quiz.find(item => item.name === "신라 달빛기행").quiz;
             break;
     }
-
-    setMapImage(imageUrl);
 
     // 기존 포인터들과 라인을 제거합니다.
     mapsDiv.querySelectorAll('.pointer, .line').forEach(element => element.remove());
@@ -88,15 +89,113 @@ async function startQuiz() {
     });
 
     updateLines();
+    currentQuizData = quizData;
+    currentQuestionIndex = 0;
+    quizInProgress = true;
+
+    // 첫 번째 문제 표시
+    displayQuestion();
+}
+
+function setMapImageByCourse() {
+    const selectedCourse = document.querySelector("#selectCourse").value;
+    let imageUrl;
+
+    switch (selectedCourse) {
+        case "창덕궁 달빛기행":
+            imageUrl = "./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/B모듈/map/창덕궁.png";
+            break;
+        case "경복궁 달빛기행":
+            imageUrl = "./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/B모듈/map/경복궁.png";
+            break;
+        case "신라 달빛기행":
+            imageUrl = "./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/B모듈/map/신라.png";
+            break;
+    }
+
+    setMapImage(imageUrl);
+}
+
+function displayQuestion() {
+    const questionContainer = document.getElementById("questionContainer");
+
+    if (!currentQuizData || currentQuestionIndex >= currentQuizData.length) {
+        alert("모든 문제를 완료했습니다!");
+        questionContainer.innerHTML = ''; // 퀴즈 문제와 버튼을 숨김
+        quizInProgress = false;
+        completeStamp();
+        return;
+    }
+
+    const questionData = currentQuizData[currentQuestionIndex];
+    questionContainer.innerHTML = '';
+
+    const questionElement = document.createElement("div");
+    questionElement.textContent = questionData.question;
+    questionContainer.appendChild(questionElement);
+
+    const answers = [...questionData.incorrect, questionData.correct];
+    shuffleArray(answers);
+
+    answers.forEach(answer => {
+        const answerElement = document.createElement("button");
+        answerElement.textContent = answer;
+        answerElement.className = "btn btn-outline-primary m-2"; // Bootstrap 버튼 스타일 추가
+        answerElement.onclick = () => checkAnswer(answer);
+        questionContainer.appendChild(answerElement);
+    });
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function checkAnswer(selectedAnswer) {
+    const questionData = currentQuizData[currentQuestionIndex];
+    if (selectedAnswer === questionData.correct) {
+        alert("정답입니다!");
+        const pointer = document.querySelector(`.pointer:nth-of-type(${currentQuestionIndex + 1})`);
+        if (pointer) {
+            pointer.style.backgroundColor = 'green';
+        }
+        currentQuestionIndex++;
+        displayQuestion();
+    } else {
+        alert("틀렸습니다. 다시 시도하세요.");
+    }
+}
+
+function completeStamp() {
+    const selectedCourse = document.querySelector("#selectCourse").value;
+    let stampNumber;
+
+    switch (selectedCourse) {
+        case "창덕궁 달빛기행":
+            stampNumber = 1;
+            break;
+        case "경복궁 달빛기행":
+            stampNumber = 2;
+            break;
+        case "신라 달빛기행":
+            stampNumber = 3;
+            break;
+    }
+
+    complete(stampNumber);
 }
 
 async function uploadStampCardImage() {
     try {
-        // 사용자 제스처를 필요로 하는 파일 열기
         const [fileHandle] = await window.showOpenFilePicker({
             types: [{
-                description: 'PNG file', accept: {'image/png': ['.png']}
-            }], excludeAcceptAllOption: true, multiple: false
+                description: 'PNG file',
+                accept: { 'image/png': ['.png'] }
+            }],
+            excludeAcceptAllOption: true,
+            multiple: false
         });
 
         const file = await fileHandle.getFile();
@@ -105,7 +204,6 @@ async function uploadStampCardImage() {
             return;
         }
 
-        // 파일 핸들을 저장합니다.
         stampFileHandle = fileHandle;
         console.log('File handle acquired successfully.');
     } catch (error) {
@@ -129,22 +227,24 @@ async function complete(stampNumber) {
         stampImg.src = './2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/B모듈/coupon/stamp.png';
         couponImg.src = stampUrl;
 
-        await Promise.all([new Promise((resolve, reject) => {
-            stampImg.onload = resolve;
-            stampImg.onerror = reject;
-        }), new Promise((resolve, reject) => {
-            couponImg.onload = resolve;
-            couponImg.onerror = reject;
-        })]);
+        await Promise.all([
+            new Promise((resolve, reject) => {
+                stampImg.onload = resolve;
+                stampImg.onerror = reject;
+            }),
+            new Promise((resolve, reject) => {
+                couponImg.onload = resolve;
+                couponImg.onerror = reject;
+            })
+        ]);
 
         canvas.width = couponImg.width;
         canvas.height = couponImg.height;
         ctx.drawImage(couponImg, 0, 0);
 
-        // 스탬프 위치를 결정
-        const baseX = 55; // 기본 X 좌표
-        const baseY = 168; // 기본 Y 좌표
-        const offsetX = (stampNumber - 1) * 215; // 스탬프 번호에 따른 X 좌표 이동 (간격 증가)
+        const baseX = 55;
+        const baseY = 168;
+        const offsetX = (stampNumber - 1) * 215;
 
         const topLeftX = baseX + offsetX;
         const topLeftY = baseY;
@@ -179,22 +279,18 @@ async function downloadCoupon() {
         canvas.height = 400;
         const ctx = canvas.getContext('2d');
 
-        // 이미지 그리기
         ctx.drawImage(img, 0, 0);
 
-        // 텍스트 추가 (20px 오른쪽으로 밀기)
         ctx.font = '20px Arial';
         ctx.fillStyle = 'black';
         ctx.fillText(userName, 520, 50);
         ctx.fillText(dateStr, 520, 100);
 
-        // 수정된 이미지를 다운로드
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');
         link.download = 'stamp_card.png';
         link.click();
 
-        // 모달 닫기
         const couponModal = document.getElementById('couponModal');
         const modalInstance = bootstrap.Modal.getInstance(couponModal);
         modalInstance.hide();
@@ -208,16 +304,16 @@ document.addEventListener('DOMContentLoaded', () => {
         couponModal.show();
     });
 
-    // 모달이 닫힐 때 백드롭 제거
     document.getElementById('couponModal').addEventListener('hidden.bs.modal', () => {
         document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
     });
 
     document.querySelector("#menus button:not([data-bs-toggle='modal'])").addEventListener('click', async () => {
+        if (!stampFileHandle) {
+            await uploadStampCardImage();
+        }
         await startQuiz();
-        await uploadStampCardImage(); // 사용자 제스처에 의해 실행
     });
 
-    // 페이지 로드 시 초기 지도를 표시
-    startQuiz();
+    setMapImageByCourse();
 });
