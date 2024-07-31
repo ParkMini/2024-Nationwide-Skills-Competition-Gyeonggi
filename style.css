@@ -23,6 +23,11 @@ a:hover {
     color: #aaa;
 }
 
+ul {
+    margin: 0;
+    padding: 0;
+}
+
 /* 헤더 영역 */
 header {
     width: 100%;
@@ -30,7 +35,8 @@ header {
     top: 0;
     left: 0;
     background-color: #eee;
-    z-index: 9999;
+    z-index: 1050;
+    padding: 5px 0;
 }
 
 header > ul {
@@ -38,29 +44,34 @@ header > ul {
     justify-content: space-around;
     text-align: center;
     align-items: center;
+    list-style: none;
+}
+
+header > ul > li {
+    position: relative;
 }
 
 header > ul > li > ul {
     display: none;
     position: absolute;
     white-space: nowrap;
-    top: 230%;
     left: 50%;
     transform: translateX(-50%);
     background-color: #eee;
+    border: 1px solid #ccc;
 }
 
-header ul:hover li ul {
+header > ul > li:hover > ul {
     display: block;
 }
 
-header > ul > li {
-    position: relative;
-    font-size: 16px;
+header > ul > li > ul > li {
+    padding: 5px 10px;
+    background-color: #eee;
 }
 
-header > ul > li > ul > li {
-    padding: 20px 10px;
+header > ul > li > ul > li:hover {
+    background-color: #ddd;
 }
 
 header .active {
