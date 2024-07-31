@@ -56,11 +56,18 @@ function updateLines() {
 }
 
 async function startQuiz() {
+    if (!stampFileHandle) {
+        const stampValid = await uploadStampCardImage();
+        if (!stampValid) {
+            return;
+        }
+        await saveUploadedStampCard();
+    }
+
     const selectedCourse = document.querySelector("#selectCourse").value;
     const mapsDiv = document.getElementById("maps");
     let quizData;
 
-    // JSON 데이터를 비동기적으로 로드
     const quiz = await loadQuizData();
 
     switch (selectedCourse) {
@@ -75,10 +82,8 @@ async function startQuiz() {
             break;
     }
 
-    // 기존 포인터들과 라인을 제거합니다.
     mapsDiv.querySelectorAll('.pointer, .line').forEach(element => element.remove());
 
-    // 포인터를 생성하고 이동 불가능하게 설정합니다.
     quizData.forEach((item, index) => {
         const pointer = document.createElement("div");
         pointer.className = "pointer";
@@ -93,7 +98,6 @@ async function startQuiz() {
     currentQuestionIndex = 0;
     quizInProgress = true;
 
-    // 첫 번째 문제 표시
     displayQuestion();
 }
 
@@ -121,7 +125,7 @@ function displayQuestion() {
 
     if (!currentQuizData || currentQuestionIndex >= currentQuizData.length) {
         alert("모든 문제를 완료했습니다!");
-        questionContainer.innerHTML = ''; // 퀴즈 문제와 버튼을 숨김
+        questionContainer.innerHTML = '';
         quizInProgress = false;
         completeStamp();
         return;
@@ -140,7 +144,7 @@ function displayQuestion() {
     answers.forEach(answer => {
         const answerElement = document.createElement("button");
         answerElement.textContent = answer;
-        answerElement.className = "btn btn-outline-primary m-2"; // Bootstrap 버튼 스타일 추가
+        answerElement.className = "btn btn-outline-primary m-2";
         answerElement.onclick = () => checkAnswer(answer);
         questionContainer.appendChild(answerElement);
     });
@@ -201,13 +205,42 @@ async function uploadStampCardImage() {
         const file = await fileHandle.getFile();
         if (file.name !== 'stamp_card.png') {
             alert('파일명이 stamp_card.png여야 합니다.');
-            return;
+            return false;
         }
 
         stampFileHandle = fileHandle;
         console.log('File handle acquired successfully.');
+        return true;
     } catch (error) {
         console.error('Error during the file open process:', error);
+        return false;
+    }
+}
+
+async function saveUploadedStampCard() {
+    try {
+        const stampFile = await stampFileHandle.getFile();
+        const stampUrl = URL.createObjectURL(stampFile);
+
+        const img = new Image();
+        img.src = stampUrl;
+
+        await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+        });
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const writable = await stampFileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        console.log('Uploaded stamp card saved successfully.');
+    } catch (error) {
+        console.error('Error saving uploaded stamp card:', error);
     }
 }
 
@@ -309,9 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelector("#menus button:not([data-bs-toggle='modal'])").addEventListener('click', async () => {
-        if (!stampFileHandle) {
-            await uploadStampCardImage();
-        }
         await startQuiz();
     });
 
