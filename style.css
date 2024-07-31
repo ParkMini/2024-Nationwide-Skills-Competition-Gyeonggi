@@ -335,11 +335,28 @@ footer * {
     position: relative;
 }
 
+#maps img {
+    width: 1280px;
+    height: 700px;
+    object-fit: cover;
+}
+
 #maps .pointer {
     position: absolute;
     width: 20px;
     height: 20px;
     background-color: red;
-    top: 0;
-    left: 0;
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    line-height: 20px;
+    border-radius: 50%;
+    z-index: 10; /* 포인터가 간선 위에 표시되도록 */
+}
+
+#maps .line {
+    position: absolute;
+    background-color: black;
+    z-index: 5;
+    transform-origin: 0 0; /* 회전 중심을 왼쪽 위로 설정 */
 }
