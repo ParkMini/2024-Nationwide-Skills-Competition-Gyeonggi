@@ -7,6 +7,7 @@
     <title>달빛기행축제</title>
     <link rel="stylesheet" href="./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/bootstrap-5.3.3-dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
 <body>
 <!-- 헤더 시작 -->
@@ -49,23 +50,22 @@
 <!-- 메뉴 버튼들 시작 -->
 <div id="menus">
     <div id="left">
-        <select name="selectCourse" id="selectCourse" onchange="updateCourse()">
+        <select name="selectCourse" id="selectCourse" onchange="updateCourse(event)">
             <option value="창덕궁 달빛기행">창덕궁 달빛기행</option>
             <option value="경복궁 달빛기행">경복궁 달빛기행</option>
             <option value="신라 달빛기행">신라 달빛기행</option>
         </select>
-        <button onclick="startQuiz()">퀴즈 시작</button>
+        <button id="startQuizButton">퀴즈 시작</button>
     </div>
     <div id="right">
-        <button data-bs-toggle="modal" data-bs-target="#couponModal">쿠폰 발급</button>
+        <button data-bs-toggle="modal" data-bs-target="#couponModal" id="couponButton">쿠폰 발급</button>
     </div>
 </div>
 <!-- 메뉴 버튼들 끝 -->
 
-<!-- 퀴즈 문제 영역 시작 -->
-<div id="questionContainer" class="container my-3">
-</div>
-<!-- 퀴즈 문제 영역 끝 -->
+<!-- 퀴즈 영역 시작 -->
+<div id="questionContainer" style="padding: 20px; margin-top: 20px;"></div>
+<!-- 퀴즈 영역 끝 -->
 
 <!-- 지도 영역 시작 -->
 <div id="maps">
@@ -91,7 +91,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                <button type="button" class="btn btn-primary" onclick="downloadCoupon()">발급</button>
+                <button type="button" class="btn btn-primary" onclick="downloadCoupon(event)">발급</button>
             </div>
         </div>
     </div>
@@ -114,6 +114,8 @@
 <input type="file" id="stampInput" accept="image/*" style="display: none;">
 <canvas id="canvas" style="display: none;"></canvas>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script src="./2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 <script src="./script.js"></script>
 </body>
