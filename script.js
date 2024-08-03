@@ -329,21 +329,3 @@ async function downloadCoupon() {
         modalInstance.hide();
     };
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector("#selectCourse").addEventListener('change', updateCourse);
-    document.querySelector("#menus button[data-bs-toggle='modal']").addEventListener('click', () => {
-        const couponModal = new bootstrap.Modal(document.getElementById('couponModal'));
-        couponModal.show();
-    });
-
-    document.getElementById('couponModal').addEventListener('hidden.bs.modal', () => {
-        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-    });
-
-    document.querySelector("#menus button:not([data-bs-toggle='modal'])").addEventListener('click', async () => {
-        await startQuiz();
-    });
-
-    setMapImageByCourse();
-});
