@@ -1,0 +1,55 @@
+
+<!-- 메뉴 버튼들 시작 -->
+<div id="menus">
+    <div id="left">
+        <select name="selectCourse" id="selectCourse" onchange="updateCourse()">
+            <option value="창덕궁 달빛기행">창덕궁 달빛기행</option>
+            <option value="경복궁 달빛기행">경복궁 달빛기행</option>
+            <option value="신라 달빛기행">신라 달빛기행</option>
+        </select>
+        <button onclick="startQuiz()">퀴즈 시작</button>
+    </div>
+    <div id="right">
+        <button data-bs-toggle="modal" data-bs-target="#couponModal">쿠폰 발급</button>
+    </div>
+</div>
+<!-- 메뉴 버튼들 끝 -->
+
+<!-- 퀴즈 문제 영역 시작 -->
+<div id="questionContainer" class="container my-3">
+</div>
+<!-- 퀴즈 문제 영역 끝 -->
+
+<!-- 지도 영역 시작 -->
+<div id="maps">
+    <img id="mapImage" src="" alt="지도 이미지">
+</div>
+<!-- 지도 영역 끝 -->
+
+<!-- 쿠폰 모달 시작 -->
+<div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="couponModalLabel">쿠폰 발급</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="couponForm">
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">이름을 입력하세요:</label>
+                        <input type="text" class="form-control" id="userName" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="downloadCoupon()">발급</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 쿠폰 모달 끝 -->
+
+<input type="file" id="stampInput" accept="image/*" style="display: none;">
+<canvas id="canvas" style="display: none;"></canvas>
