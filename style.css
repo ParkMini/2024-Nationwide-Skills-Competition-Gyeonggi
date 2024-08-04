@@ -371,3 +371,7 @@ footer * {
     z-index: 5;
     transform-origin: 0 0; /* 회전 중심을 왼쪽 위로 설정 */
 }
+
+#questionContainer {
+    margin-left: 300px;
+}
