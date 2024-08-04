@@ -327,15 +327,127 @@ async function downloadCoupon() {
 
 // 로그인 페이지
 function registerPageSetup() {
+    let isShiftActive = false;
+    let isCapsLockActive = false;
+
+    const keysLayout = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let currentLayout = []; // To store the shuffled layout
+
+    // Shuffle the keyboard layout initially
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // Render the keyboard without changing the layout
+    function renderKeyboard() {
+        const keyboardRow = $('#virtualKeyboard .keyboard-row');
+        keyboardRow.empty(); // Clear existing keys
+
+        // Use the currentLayout to render keys
+        currentLayout.forEach(key => {
+            const keyElement = $('<div class="keyboard-key"></div>').text(key);
+            keyElement.on('click', function (event) {
+                event.stopPropagation(); // Prevent hiding keyboard on click
+                let char;
+                if (isShiftActive || isCapsLockActive) {
+                    char = key.toUpperCase();
+                } else {
+                    char = key.toLowerCase();
+                }
+                const passwordField = $('#password');
+                passwordField.val(passwordField.val() + char);
+
+                if (isShiftActive) {
+                    toggleShift(); // Reset shift after one use
+                }
+            });
+            keyboardRow.append(keyElement);
+        });
+
+        // Update key display for Shift and CapsLock states
+        if (isShiftActive || isCapsLockActive) {
+            $('.keyboard-key').each(function () {
+                const currentKey = $(this).text();
+                $(this).text(currentKey.toUpperCase());
+            });
+        } else {
+            $('.keyboard-key').each(function () {
+                const currentKey = $(this).text();
+                $(this).text(currentKey.toLowerCase());
+            });
+        }
+    }
+
+    function toggleShift() {
+        isShiftActive = !isShiftActive;
+        $('#shiftKey').toggleClass('active', isShiftActive);
+        renderKeyboard(); // Re-render keyboard to update key cases, not layout
+    }
+
+    function toggleCapsLock() {
+        isCapsLockActive = !isCapsLockActive;
+        $('#capsLockKey').toggleClass('active', isCapsLockActive);
+        renderKeyboard(); // Re-render keyboard to update key cases, not layout
+    }
+
+    // Disable physical keyboard input for password field
+    $('#password').on('keydown', function (e) {
+        e.preventDefault(); // Prevent default key input
+    });
+
+    // Show keyboard when password field is focused
+    $('#password').on('focus', function (event) {
+        event.stopPropagation(); // Prevent bubbling that might hide the keyboard
+        if (currentLayout.length === 0) {
+            // Shuffle and render the keyboard for the first time
+            currentLayout = shuffle(keysLayout.split(''));
+            renderKeyboard(); // Render keyboard with shuffled keys
+        }
+        $('#virtualKeyboard').show();
+    });
+
+    // Hide keyboard when clicking outside
+    $(document).on('click', function (event) {
+        if (!$(event.target).closest('#password, #virtualKeyboard').length) {
+            $('#virtualKeyboard').hide();
+        }
+    });
+
+    // Shift key toggle
+    $('#shiftKey').on('click', function (event) {
+        event.stopPropagation(); // Prevent hiding keyboard on click
+        toggleShift();
+    });
+
+    // CapsLock key toggle
+    $('#capsLockKey').on('click', function (event) {
+        event.stopPropagation(); // Prevent hiding keyboard on click
+        toggleCapsLock();
+    });
+
+    // Backspace key functionality
+    $('#backspaceKey').on('click', function (event) {
+        event.stopPropagation(); // Prevent hiding keyboard on click
+        const passwordField = $('#password');
+        passwordField.val(passwordField.val().slice(0, -1));
+    });
+
     $('#username').on('input', function () {
         const username = $(this).val();
 
         if (username) {
             $.ajax({
                 url: '/api/auth',
-                type: 'GET', data: {
-                    type: 'duplicateCheck', username: username
-                }, success: function (response) {
+                type: 'GET',
+                data: {
+                    type: 'duplicateCheck',
+                    username: username
+                },
+                success: function (response) {
                     if (response === '존재함') {
                         $('#usernameFeedback').text('중복된 아이디입니다.').css('color', 'red');
                         $('#registerBtn').prop('disabled', true);
@@ -343,7 +455,8 @@ function registerPageSetup() {
                         $('#usernameFeedback').text('사용할 수 있는 아이디입니다.').css('color', 'green');
                         $('#registerBtn').prop('disabled', false);
                     }
-                }, error: function (xhr, status, error) {
+                },
+                error: function (xhr, status, error) {
                     $('#usernameFeedback').text('오류 발생: ' + error).css('color', 'red');
                 }
             });
@@ -362,16 +475,22 @@ function registerPageSetup() {
 
         $.ajax({
             url: '/api/auth',
-            type: 'POST', data: JSON.stringify({
-                type: 'register', username: username, password: password, name: name
-            }), contentType: 'application/json', success: function (response) {
+            type: 'POST',
+            data: JSON.stringify({
+                type: 'register',
+                username: username,
+                password: password,
+                name: name
+            }),
+            contentType: 'application/json',
+            success: function (response) {
                 $('#message').text(response);
-            }, error: function (xhr, status, error) {
+            },
+            error: function (xhr, status, error) {
                 $('#message').text('오류 발생: ' + error);
             }
         });
     });
-
 }
 
 function loginPageSetup() {

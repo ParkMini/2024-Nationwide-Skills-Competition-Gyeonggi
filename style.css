@@ -375,3 +375,42 @@ footer * {
 #questionContainer {
     margin-left: 300px;
 }
+
+/* 회원가입 페이지 */
+#virtualKeyboard {
+    width: 800px;
+    margin: 0 auto;
+}
+
+.keyboard-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.keyboard-key {
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+    text-align: center;
+    line-height: 50px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+
+.keyboard-key.active {
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;
+}
+
+.btn-secondary.active {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary {
+    width: auto;
+}
