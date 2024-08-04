@@ -196,11 +196,8 @@ async function uploadStampCardImage() {
     try {
         const [fileHandle] = await window.showOpenFilePicker({
             types: [{
-                description: 'PNG file',
-                accept: {'image/png': ['.png']}
-            }],
-            excludeAcceptAllOption: true,
-            multiple: false
+                description: 'PNG file', accept: {'image/png': ['.png']}
+            }], excludeAcceptAllOption: true, multiple: false
         });
 
         const file = await fileHandle.getFile();
@@ -261,16 +258,13 @@ async function complete(stampNumber) {
         stampImg.src = './2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/B모듈/coupon/stamp.png';
         couponImg.src = stampUrl;
 
-        await Promise.all([
-            new Promise((resolve, reject) => {
-                stampImg.onload = resolve;
-                stampImg.onerror = reject;
-            }),
-            new Promise((resolve, reject) => {
-                couponImg.onload = resolve;
-                couponImg.onerror = reject;
-            })
-        ]);
+        await Promise.all([new Promise((resolve, reject) => {
+            stampImg.onload = resolve;
+            stampImg.onerror = reject;
+        }), new Promise((resolve, reject) => {
+            couponImg.onload = resolve;
+            couponImg.onerror = reject;
+        })]);
 
         canvas.width = couponImg.width;
         canvas.height = couponImg.height;
@@ -338,13 +332,10 @@ function registerPageSetup() {
 
         if (username) {
             $.ajax({
-                url: '/api/auth', // replace with your API endpoint
-                type: 'GET',
-                data: {
-                    type: 'duplicateCheck',
-                    username: username
-                },
-                success: function (response) {
+                url: '/api/auth',
+                type: 'GET', data: {
+                    type: 'duplicateCheck', username: username
+                }, success: function (response) {
                     if (response === '존재함') {
                         $('#usernameFeedback').text('중복된 아이디입니다.').css('color', 'red');
                         $('#registerBtn').prop('disabled', true);
@@ -352,8 +343,7 @@ function registerPageSetup() {
                         $('#usernameFeedback').text('사용할 수 있는 아이디입니다.').css('color', 'green');
                         $('#registerBtn').prop('disabled', false);
                     }
-                },
-                error: function (xhr, status, error) {
+                }, error: function (xhr, status, error) {
                     $('#usernameFeedback').text('오류 발생: ' + error).css('color', 'red');
                 }
             });
@@ -371,22 +361,38 @@ function registerPageSetup() {
         const name = $('#name').val();
 
         $.ajax({
-            url: '/api/auth', // replace with your API endpoint
-            type: 'POST',
-            data: JSON.stringify({
-                type: 'register',
-                username: username,
-                password: password,
-                name: name
-            }),
-            contentType: 'application/json',
-            success: function (response) {
+            url: '/api/auth',
+            type: 'POST', data: JSON.stringify({
+                type: 'register', username: username, password: password, name: name
+            }), contentType: 'application/json', success: function (response) {
                 $('#message').text(response);
-            },
-            error: function (xhr, status, error) {
+            }, error: function (xhr, status, error) {
                 $('#message').text('오류 발생: ' + error);
             }
         });
     });
 
+}
+
+function loginPageSetup() {
+    $('#loginForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const username = $('#username').val();
+        const password = $('#password').val();
+
+        $.ajax({
+            url: './api/auth',
+            type: 'POST', data: JSON.stringify({
+                type: 'login', username: username, password: password
+            }), contentType: 'application/json', success: function (response) {
+                $('#message').text(response);
+                if (response.includes('성공')) {
+                    window.location.href = '/';
+                }
+            }, error: function (xhr, status, error) {
+                $('#message').text('오류 발생: ' + error);
+            }
+        });
+    });
 }
