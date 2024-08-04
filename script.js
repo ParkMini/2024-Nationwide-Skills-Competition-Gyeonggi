@@ -500,18 +500,122 @@ function loginPageSetup() {
         const username = $('#username').val();
         const password = $('#password').val();
 
+        if (username && password) {
+            // Show CAPTCHA modal
+            setupCaptcha();
+            $('#captchaModal').modal('show');
+        }
+    });
+
+    // Initialize slider and puzzle
+    let puzzlePosition = 0;
+    let sliderPosition = 0;
+    let isDragging = false;
+    const maxSliderValue = 250; // Slider range
+
+    function setupCaptcha() {
+        // Randomly select an image
+        const images = [
+            '2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/C모듈/capcha/1.jpg',
+            '2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/C모듈/capcha/2.jpg',
+            '2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/C모듈/capcha/3.jpg',
+            '2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/C모듈/capcha/4.jpg',
+            '2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/제공파일/C모듈/capcha/5.jpg'
+        ];
+        const selectedImage = images[Math.floor(Math.random() * images.length)];
+        $('.puzzle-image').attr('src', selectedImage);
+
+        // Randomly set the puzzle piece position
+        puzzlePosition = Math.floor(Math.random() * (maxSliderValue - 50) + 25);
+
+        // Set the puzzle piece to the correct position
+        $('#puzzlePiece').css({
+            'left': '0px',  // Start from the left
+            'top': '50px',  // Fixed top position for puzzle piece
+            'background-image': 'url(' + selectedImage + ')',
+            'background-position': `-${puzzlePosition}px -50px`  // Match the cut-out area
+        });
+
+        // Set the puzzle hole position with a solid color
+        $('#puzzleHole').css({
+            'left': puzzlePosition + 'px',
+            'top': '50px'
+        });
+
+        // Create a solid color to fill the hole
+        $('.puzzle-image').css({
+            'clip-path': `polygon(${puzzlePosition}% 0%, ${puzzlePosition}% 100%, ${puzzlePosition + 16.67}% 100%, ${puzzlePosition + 16.67}% 0%)`  // Mask area
+        });
+
+        // Reset slider position
+        sliderPosition = 0;
+        $('#sliderThumb').css('left', sliderPosition + 'px');
+        $('#accuracy').text('정확도: 0%');
+
+        // Bind slider events
+        $('#sliderThumb').on('mousedown', function (event) {
+            isDragging = true;
+        });
+
+        $(document).on('mouseup', function () {
+            if (isDragging) {
+                isDragging = false;
+                // Calculate accuracy when user stops dragging
+                calculateAccuracy();
+            }
+        });
+
+        $(document).on('mousemove', function (event) {
+            if (isDragging) {
+                sliderPosition = event.pageX - $('#slider').offset().left;
+                if (sliderPosition < 0) sliderPosition = 0;
+                if (sliderPosition > maxSliderValue) sliderPosition = maxSliderValue;
+                $('#sliderThumb').css('left', sliderPosition + 'px');
+
+                // Update puzzle piece position
+                $('#puzzlePiece').css('left', sliderPosition + 'px');
+
+                // Update accuracy display in real-time
+                const accuracy = 100 - Math.abs(sliderPosition - puzzlePosition) / maxSliderValue * 100;
+                $('#accuracy').text('정확도: ' + accuracy.toFixed(2) + '%');
+            }
+        });
+    }
+
+    function calculateAccuracy() {
+        const accuracy = 100 - Math.abs(sliderPosition - puzzlePosition) / maxSliderValue * 100;
+        if (accuracy >= 90) {
+            // If the accuracy is 90% or more, proceed with login
+            $('#captchaModal').modal('hide'); // Close the modal
+            performLogin();
+        } else {
+            $('#message').text('로그인이 거부되었습니다. 정확도가 90% 이상이어야 합니다.');
+            $('#captchaModal').modal('hide'); // Close the modal
+        }
+    }
+
+    function performLogin() {
+        const username = $('#username').val();
+        const password = $('#password').val();
+
         $.ajax({
             url: './api/auth',
-            type: 'POST', data: JSON.stringify({
-                type: 'login', username: username, password: password
-            }), contentType: 'application/json', success: function (response) {
+            type: 'POST',
+            data: JSON.stringify({
+                type: 'login',
+                username: username,
+                password: password
+            }),
+            contentType: 'application/json',
+            success: function (response) {
                 $('#message').text(response);
                 if (response.includes('성공')) {
                     window.location.href = '/';
                 }
-            }, error: function (xhr, status, error) {
+            },
+            error: function (xhr, status, error) {
                 $('#message').text('오류 발생: ' + error);
             }
         });
-    });
+    }
 }

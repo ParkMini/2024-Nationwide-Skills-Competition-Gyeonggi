@@ -414,3 +414,78 @@ footer * {
 .btn-secondary {
     width: auto;
 }
+
+/* 로그인 페이지 */
+.puzzle-container {
+    position: relative;
+    width: 300px;
+    height: 150px;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.puzzle-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.puzzle-piece {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-size: 300px 150px; /* Match container size */
+    z-index: 2;
+    cursor: pointer;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    background-repeat: no-repeat;
+}
+
+.puzzle-hole {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: #888; /* Solid color for the cut-out */
+    z-index: 1;
+    pointer-events: none; /* Make sure this doesn't interfere with dragging */
+}
+
+.slider-bar {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.slider {
+    width: 100%;
+    height: 5px;
+    background-color: #ccc;
+    position: relative;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.slider-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: #007bff;
+    position: absolute;
+    top: -7.5px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.accuracy {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}

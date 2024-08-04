@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($jsonArray["type"] == "login") {
         $username = $jsonArray["username"];
         $password = $jsonArray["password"];
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username, password = :password");
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username AND password = :password");
         $stmt->bindParam(":username", $username);
         $stmt->bindParam(":password", $password);
         $stmt->execute();
