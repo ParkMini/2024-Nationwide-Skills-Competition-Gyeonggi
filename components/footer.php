@@ -13,6 +13,7 @@
 
 
 <script src="../2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+<script src="../2024_웹디자인및개발_전국기능경기대회문제(경기)_최종버전/공통제공파일/jquery/jquery.js"></script>
 <script src="../script.js"></script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+// 퀴즈 페이지
 let stampFileHandle;
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
@@ -196,7 +197,7 @@ async function uploadStampCardImage() {
         const [fileHandle] = await window.showOpenFilePicker({
             types: [{
                 description: 'PNG file',
-                accept: { 'image/png': ['.png'] }
+                accept: {'image/png': ['.png']}
             }],
             excludeAcceptAllOption: true,
             multiple: false
@@ -328,4 +329,64 @@ async function downloadCoupon() {
         const modalInstance = bootstrap.Modal.getInstance(couponModal);
         modalInstance.hide();
     };
+}
+
+// 로그인 페이지
+function registerPageSetup() {
+    $('#username').on('input', function () {
+        const username = $(this).val();
+
+        if (username) {
+            $.ajax({
+                url: '/api/auth', // replace with your API endpoint
+                type: 'GET',
+                data: {
+                    type: 'duplicateCheck',
+                    username: username
+                },
+                success: function (response) {
+                    if (response === '존재함') {
+                        $('#usernameFeedback').text('중복된 아이디입니다.').css('color', 'red');
+                        $('#registerBtn').prop('disabled', true);
+                    } else {
+                        $('#usernameFeedback').text('사용할 수 있는 아이디입니다.').css('color', 'green');
+                        $('#registerBtn').prop('disabled', false);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    $('#usernameFeedback').text('오류 발생: ' + error).css('color', 'red');
+                }
+            });
+        } else {
+            $('#usernameFeedback').text('');
+            $('#registerBtn').prop('disabled', true);
+        }
+    });
+
+    $('#registerForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const username = $('#username').val();
+        const password = $('#password').val();
+        const name = $('#name').val();
+
+        $.ajax({
+            url: '/api/auth', // replace with your API endpoint
+            type: 'POST',
+            data: JSON.stringify({
+                type: 'register',
+                username: username,
+                password: password,
+                name: name
+            }),
+            contentType: 'application/json',
+            success: function (response) {
+                $('#message').text(response);
+            },
+            error: function (xhr, status, error) {
+                $('#message').text('오류 발생: ' + error);
+            }
+        });
+    });
+
 }
