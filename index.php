@@ -23,6 +23,10 @@ if ($resource[1] != "api") {
         case "register":
             $page = "./pages/register.html";
             break;
+        case "login":
+            $page = "./pages/login.html";
+            break;
+
         default:
             echo "<h1>잘못된 접근입니다.</h1>";
             return;

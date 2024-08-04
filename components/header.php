@@ -39,8 +39,8 @@
             <a href="#">마이페이지</a>
         </li>
         <li>
-            <a href="#">로그인</a>
-            <a href="#">회원가입</a>
+            <a href="./login">로그인</a>
+            <a href="./register">회원가입</a>
         </li>
     </ul>
 </header>
